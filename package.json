@@ -10,9 +10,8 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "tsc -w & nodemon dist/index.js",
-    "test": "build && node dist/index.js test",
-    "import": "npm run build && node dist/index.js import",
-    "sync": "npm run build && node dist/index.js sync",
+    "import": "node dist/index.js import",
+    "sync": "node dist/index.js sync",
     "webhook": "npm run build && node dist/index.js webhook",
     "postinstall": "npm run build"
   },

@@ -12,8 +12,8 @@ export async function syncIssues(options: { mappingFile?: string, continuous?: b
   console.log('Starting synchronization of GitHub issues with YouTrack tasks...');
 
   // Validate configuration
-  const { githubClient, youTrackClient, mappingFile, mappingStorage } = await validate(options);
-  // Get all mappings
+  const {githubClient, youTrackClient, mappingFile, mappingStorage} = await validate(options);
+
   const mappings = mappingStorage.getAllMappings();
   if (mappings.length === 0) {
     console.error('No mappings found. Please run the import command first.');
@@ -104,27 +104,10 @@ export async function syncIssues(options: { mappingFile?: string, continuous?: b
     console.log(`- Total processed: ${updatedIssues.length}`);
     console.log(`\nMapping file saved to: ${mappingFile}`);
 
-    return { updatedCount, errorCount, unchangedCount };
+    return {updatedCount, errorCount, unchangedCount};
   };
 
-  // Perform initial sync
   await performSync();
-
-  // If continuous mode is enabled, set up interval
-  if (options.continuous) {
-    const intervalMinutes = SYNC_CONFIG.intervalMinutes;
-    console.log(`\nContinuous sync enabled. Will check for updates every ${intervalMinutes} minutes.`);
-
-    // Set up interval
-    setInterval(async () => {
-      console.log(`\n[${new Date().toLocaleString()}] Running scheduled sync...`);
-      try {
-        await performSync();
-      } catch (error) {
-        console.error('Error during scheduled sync:', error);
-      }
-    }, intervalMinutes * 60 * 1000);
-  }
 }
 
 /**
