@@ -55,8 +55,6 @@ export class WebhookServer {
           await this.handleIssueCreated(payload.issue);
           break;
         case 'edited':
-          await this.handleIssueUpdated(payload.issue);
-          break;
         case 'closed':
         case 'reopened':
         case 'labeled':

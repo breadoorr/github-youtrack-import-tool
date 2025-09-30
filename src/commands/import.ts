@@ -55,6 +55,15 @@ export async function importIssues(options: { mappingFile?: string } = {}): Prom
       }
     }
 
+    // Import labels if any
+    if (issue.labels.length > 0) {
+      console.log(`Fetching and importing ${issue.labels} labels for issue #${issue.number}`);
+
+      for (const label of issue.labels) {
+        await youTrackClient.addTag(task.id, label.name)
+      }
+    }
+
     // Save mapping
     mappingStorage.addOrUpdateMapping({
       githubIssueId: issue.id,

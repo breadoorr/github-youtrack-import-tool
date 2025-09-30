@@ -50,3 +50,7 @@ export interface YouTrackComment {
     fullName: string;
   };
 }
+
+export interface YouTrackTag {
+  id: string;
+}

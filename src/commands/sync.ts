@@ -2,7 +2,8 @@ import { GitHubClient } from '../github/github-client';
 import { YouTrackClient } from '../youtrack/youtrack-client';
 import {convertIssueToTask, convertIssueToTaskUpdate, formatComment} from '../utils/converter';
 import { IssueTaskMapping } from '../models/mapping';
-import {SYNC_CONFIG, validate} from '../config/config';
+import {validate} from '../config/config';
+import {GitHubIssue} from "../models/github";
 
 /**
  * Synchronize GitHub issues with YouTrack tasks
@@ -82,6 +83,9 @@ export async function syncIssues(options: { mappingFile?: string, continuous?: b
         // Sync comments if needed
         await syncComments(githubClient, youTrackClient, issue.number, mapping);
 
+        // Sync labels if needed
+        await syncLabels(youTrackClient, issue, mapping.youtrackTaskId);
+
         // Update last synced time
         mappingStorage.addOrUpdateMapping({
           ...mapping,
@@ -158,6 +162,23 @@ async function syncComments(
         await youtrackClient.addComment(mapping.youtrackTaskId, formattedComment);
         console.log(`Added new comment from GitHub issue #${issueNumber}`);
       }
+    }
+  }
+}
+
+/**
+ * Synchronise labels for an issue
+ * @param youTrackClient YouTrack client
+ * @param issue Github issue
+ * @param youtrackTaskId id of task in YouTrack
+ */
+async function syncLabels(youTrackClient: YouTrackClient, issue: GitHubIssue, youtrackTaskId: string): Promise<void> {
+  // Sync labels if any
+  if (issue.labels.length > 0) {
+    console.log(`Fetching and importing ${issue.labels} labels for issue #${issue.number}`);
+
+    for (const label of issue.labels) {
+      await youTrackClient.addTag(youtrackTaskId, label.name)
     }
   }
 }

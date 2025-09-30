@@ -1,10 +1,10 @@
 import axios, { AxiosInstance } from 'axios';
 import { YOUTRACK_CONFIG } from '../config/config';
-import { 
-  YouTrackTask, 
-  YouTrackTaskCreationRequest, 
+import {
+  YouTrackTask,
+  YouTrackTaskCreationRequest,
   YouTrackTaskUpdateRequest,
-  YouTrackComment
+  YouTrackComment, YouTrackTag
 } from '../models/youtrack';
 
 export class YouTrackClient {
@@ -46,7 +46,6 @@ export class YouTrackClient {
 
   /**
    * Create a new task in YouTrack
-   * @param task The task creation request
    * @returns The created task or null if creation failed
    */
 
@@ -132,6 +131,44 @@ export class YouTrackClient {
       return response.data as YouTrackComment;
     } catch (error) {
       console.error(`Error adding comment to YouTrack task ${taskId}:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Add a tag to a task
+   * @param taskId the ID of the task
+   * @param label the name of the Tag
+   * @returns create tag if successful or null if failed
+   */
+  public async addTag(taskId: string, label: string): Promise<YouTrackTag | null> {
+    try {
+      // If the tag already exists get its ID
+      const tagRequest = await this.client.get(`tags?fields=id,name`)
+      let tagId = tagRequest.data.find((r: { id: string; name: string; }) => r.name === label);
+      tagId = tagId?.id;
+
+      // Create a tag if not exists
+      if (!tagId) {
+        tagId = (await this.client.post('/tags', {
+          name: label,
+        })).data.id;
+      }
+
+      // Add tag to an issue
+      try {
+        await this.client.post(`/issues/${taskId}/tags`, {
+          id: tagId,
+        })
+      } catch (e) {
+        console.error(`Error adding tag ${taskId}:`, e);
+      }
+
+      return {
+        id: tagId,
+      };
+    } catch (error) {
+      console.error(`Error adding tag to YouTrack tag ${taskId}:`, error);
       return null;
     }
   }
