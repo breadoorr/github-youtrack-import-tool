@@ -21,7 +21,6 @@ export class WebhookServer {
    * @param options Options for the webhook server
    */
   constructor(options: { mappingFile?: string } = {}) {
-    // Initialize Express app
     this.app = express();
 
     // Initialize Octokit Webhooks
@@ -50,9 +49,7 @@ export class WebhookServer {
   private setupWebhookHandlers(): void {
     // Handle issue events (created, edited, etc.)
     this.webhooks.on('issues', async ({ name, payload }) => {
-      console.log(`Received webhook event: ${name}.${payload.action}`);
 
-      // Handle based on the action
       switch (payload.action) {
         case 'opened':
           await this.handleIssueCreated(payload.issue);
@@ -74,11 +71,11 @@ export class WebhookServer {
     });
 
     // Handle issue comment events
-    this.webhooks.on('issue_comment', async ({ id, name, payload }) => {
+    this.webhooks.on('issue_comment', async ({ name, payload }) => {
       console.log(`Received webhook event: ${name}.${payload.action}`);
 
       if (payload.action === 'created' || payload.action === 'edited') {
-        await this.handleIssueCommentCreatedOrUpdated(payload.issue, payload.comment);
+        await this.handleIssueCommentCreatedOrUpdated(payload.issue);
       }
     });
   }
@@ -120,8 +117,6 @@ export class WebhookServer {
       console.log(`Webhook server listening on port ${port}`);
       console.log(`Webhook endpoint: ${WEBHOOK_CONFIG.path}`);
     });
-    // const { importIssues } = await import('../commands/import');
-    // await importIssues({ mappingFile: this.mappingStorage['filePath'] });
   }
 
   /**
@@ -183,9 +178,8 @@ export class WebhookServer {
   /**
    * Handle issue comment created or updated event
    * @param issue The GitHub issue
-   * @param comment The GitHub comment
    */
-  private async handleIssueCommentCreatedOrUpdated(issue: any, comment: any): Promise<void> {
+  private async handleIssueCommentCreatedOrUpdated(issue: any): Promise<void> {
     try {
       console.log(`Processing comment on issue #${issue.number}`);
 

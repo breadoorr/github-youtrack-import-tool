@@ -10,7 +10,9 @@ yarn-error.log*
 .pnp.js
 
 .vscode/*
+.idea/*
 dist/*
 
 .env
 package-lock.json
+issue-task-mapping.json

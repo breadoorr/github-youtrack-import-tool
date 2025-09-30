@@ -39,10 +39,9 @@ export class GitHubClient {
         });
         
         // Filter out pull requests (they are also returned by the issues API)
-        const filteredIssues = response.data.filter(issue => !('pull_request' in issue)) as GitHubIssue[];
+        const filteredIssues = response.data.filter(issue => !('pull_request' in issue)) as unknown as GitHubIssue[];
         issues.push(...filteredIssues);
-        
-        // Check if there are more pages
+
         hasMorePages = response.data.length === 100;
         page++;
       } catch (error) {
@@ -73,7 +72,7 @@ export class GitHubClient {
         return null;
       }
       
-      return response.data as GitHubIssue;
+      return response.data as unknown as GitHubIssue;
     } catch (error) {
       console.error(`Error fetching GitHub issue #${issueNumber}:`, error);
       return null;

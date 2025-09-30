@@ -61,16 +61,6 @@ export class MappingStorage {
     return this.mappings.find(m => m.githubIssueId === githubIssueId);
   }
 
-  // Get mapping by GitHub issue number
-  public getMappingByGithubIssueNumber(githubIssueNumber: number): IssueTaskMapping | undefined {
-    return this.mappings.find(m => m.githubIssueNumber === githubIssueNumber);
-  }
-
-  // Get mapping by YouTrack task ID
-  public getMappingByYoutrackTaskId(youtrackTaskId: string): IssueTaskMapping | undefined {
-    return this.mappings.find(m => m.youtrackTaskId === youtrackTaskId);
-  }
-
   // Get all mappings
   public getAllMappings(): IssueTaskMapping[] {
     return [...this.mappings];

@@ -13,24 +13,31 @@ export interface YouTrackTask {
 
 // YouTrack custom field model
 export interface YouTrackCustomField {
+  name: string;
   $type: string;
-  name?: string;
-
-  field?: {
-    name: string;
-    $type: string;
-    fieldType: {
-      id: string;
-      $type: string;
-    }
-  };
-
   value?: {
     name?: string;
-    id?: string;
+  } | null;
+}
+
+// YouTrack task creation request
+export interface YouTrackTaskCreationRequest {
+  $type?: string;
+  project: {
+    id: string;
     $type?: string;
-    login?: string;
-  } | string | number | null;
+  };
+  summary: string;
+  description: string | null;
+  customFields?: YouTrackCustomField[];
+}
+
+// YouTrack task update request
+export interface YouTrackTaskUpdateRequest {
+  $type?: string;
+  summary?: string;
+  description?: string;
+  customFields?: YouTrackCustomField[];
 }
 
 export interface YouTrackComment {
@@ -42,24 +49,4 @@ export interface YouTrackComment {
     login: string;
     fullName: string;
   };
-}
-
-// YouTrack task creation request
-export interface YouTrackTaskCreationRequest {
-  $type: "Issue";
-  project: {
-    id: string;
-    $type: "Project";
-  };
-  summary: string;
-  description: string;
-  customFields?: YouTrackCustomField[];
-}
-
-// YouTrack task update request
-export interface YouTrackTaskUpdateRequest {
-  $type: "Issue";
-  summary?: string;
-  description?: string;
-  customFields?: YouTrackCustomField[];
 }

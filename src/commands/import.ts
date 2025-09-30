@@ -35,7 +35,7 @@ export async function importIssues(options: { mappingFile?: string } = {}): Prom
     const taskRequest = convertIssueToTask(issue);
 
     // Create task in YouTrack
-    console.log(`Importing issue #${issue.number}: ${issue.title}`);
+    console.log(`Importing issue #${issue.id}: ${issue.title}`);
     const task = await youTrackClient.createTask(taskRequest);
 
     if (!task) {
@@ -65,7 +65,7 @@ export async function importIssues(options: { mappingFile?: string } = {}): Prom
     });
 
     importedCount++;
-    console.log(`Successfully imported issue #${issue.number} as ${task.idReadable}`);
+    console.log(`Successfully imported issue #${issue.number} as ${task.id}`);
   }
 
   // Print summary

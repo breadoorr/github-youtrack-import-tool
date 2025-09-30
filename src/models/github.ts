@@ -6,9 +6,9 @@ export interface GitHubIssue {
   body: string | null;
   state: 'open' | 'closed';
   html_url: string;
-  created_at: string;
-  updated_at: string;
-  closed_at: string | null;
+  created_at: number;
+  updated_at: number;
+  closed_at: number | null;
   user: {
     login: string;
     avatar_url: string;
