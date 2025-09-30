@@ -48,7 +48,7 @@ export class WebhookServer {
    */
   private setupWebhookHandlers(): void {
     // Handle issue events (created, edited, etc.)
-    this.webhooks.on('issues', async ({ name, payload }) => {
+    this.webhooks.on('issues', async ({ payload }) => {
 
       switch (payload.action) {
         case 'opened':

@@ -8,19 +8,6 @@ import path from 'path';
 
 // Create CLI program
 const program = new Command();
-//
-// program
-//     .command('test')
-//     .description('Test project')
-//     .action(async () => {
-//         try {
-//             const client = new YouTrackClient();
-//             await client.getProjectId();
-//         }
-//         catch (error) {
-//         console.error(error);
-//         }
-//     });
 
 // Set program metadata
 program
@@ -77,7 +64,7 @@ program
       });
 
       // Start the server
-      webhookServer.start();
+      await webhookServer.start();
 
       console.log('Webhook server started. Press Ctrl+C to stop.');
     } catch (error) {
@@ -94,7 +81,6 @@ program
     program.help();
   });
 
-// Parse command line arguments
 program.parse(process.argv);
 
 // If no arguments provided, show help
