@@ -14,8 +14,8 @@ A command-line tool to import issues from GitHub repositories into YouTrack and 
 ## Prerequisites
 
 - Node.js (v14 or later)
-- GitHub personal access token with `repo` scope
-- YouTrack permanent token with appropriate permissions
+- GitHub personal access token with `Issues` scope
+- YouTrack access token with appropriate permissions
 
 ## Installation
 
@@ -52,9 +52,6 @@ YOUTRACK_URL=https://your-instance.youtrack.cloud
 YOUTRACK_TOKEN=your_youtrack_token
 YOUTRACK_PROJECT_ID=your_project_id
 
-# Synchronization Configuration
-SYNC_INTERVAL_MINUTES=60  # How often to check for updates (in minutes)
-
 # Webhook Configuration
 WEBHOOK_PORT=3000  # Port for the webhook server
 WEBHOOK_PATH=/webhook  # URL path for the webhook endpoint
@@ -63,7 +60,7 @@ WEBHOOK_SECRET=your_webhook_secret  # Secret for GitHub webhook signature valida
 
 ### GitHub Configuration
 
-- `GITHUB_TOKEN`: A GitHub personal access token with the `repo` scope
+- `GITHUB_TOKEN`: A GitHub personal access token with the `Issues` scope
 - `GITHUB_OWNER`: The owner of the GitHub repository (username or organization)
 - `GITHUB_REPO`: The name of the GitHub repository
 
@@ -77,7 +74,7 @@ To create a GitHub personal access token:
 
 - `YOUTRACK_URL`: The URL of your YouTrack instance (e.g., `https://your-instance.youtrack.cloud`)
 - `YOUTRACK_TOKEN`: A YouTrack permanent token with appropriate permissions
-- `YOUTRACK_PROJECT_ID`: The ID of the YouTrack project to import issues into
+- `YOUTRACK_PROJECT_NAME`: The name of the YouTrack project to import issues into
 
 To create a YouTrack permanent token:
 1. Go to YouTrack > Profile > Account Security
@@ -85,15 +82,6 @@ To create a YouTrack permanent token:
 3. Enter a name for the token
 4. Select the appropriate permissions (at minimum: Read/Write access to issues)
 5. Click "Create"
-
-To find your YouTrack project ID:
-1. Go to YouTrack > Projects
-2. Select your project
-3. The project ID is in the URL (e.g., `https://your-instance.youtrack.cloud/projects/0-0`)
-
-### Synchronization Configuration
-
-- `SYNC_INTERVAL_MINUTES`: How often to check for updates when running in continuous mode (in minutes)
 
 ### Webhook Configuration
 
@@ -172,14 +160,6 @@ When using webhooks, consider the following security best practices:
 All commands support the following options:
 
 - `-m, --mapping-file <path>`: Path to the mapping file (default: `issue-task-mapping.json` in the current directory)
-
-Command-specific options:
-
-- `sync`:
-  - `-c, --continuous`: Run in continuous mode, checking for updates periodically
-
-- `webhook`:
-  - No additional options (uses configuration from .env file)
 
 ## Example Output
 
@@ -270,12 +250,9 @@ Successfully processed updated issue #5
 
 ## Limitations
 
-- The tool currently only supports one-way synchronization (GitHub to YouTrack)
+- The tool only supports one-way synchronization (GitHub to YouTrack)
 - Custom fields in YouTrack must be configured manually
+- Assignees and creators of the issues are not transferred along
 - The tool does not handle attachments
 - Webhook server requires public internet access or a tunneling service
 - Webhook server does not support HTTPS out of the box (use a reverse proxy for production)
-
-## License
-
-MIT
