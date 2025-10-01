@@ -5,7 +5,6 @@ import {GitHubClient} from '../github/github-client';
 import {YouTrackClient} from '../youtrack/youtrack-client';
 import {MappingStorage} from '../models/mapping';
 import path from 'path';
-
 /**
  * WebhookServer class for handling GitHub webhook events
  */
@@ -15,6 +14,8 @@ export class WebhookServer {
   private githubClient: GitHubClient;
   private youtrackClient: YouTrackClient;
   private mappingStorage: MappingStorage;
+  private importing: boolean;
+  private options: { mappingFile?: string } = {}
 
   /**
    * Create a new WebhookServer instance
@@ -31,8 +32,10 @@ export class WebhookServer {
     // Initialize clients
     this.githubClient = new GitHubClient();
     this.youtrackClient = new YouTrackClient();
+    this.importing = false;
 
     // Initialize mapping storage
+    this.options = options;
     const mappingFile = options.mappingFile || path.resolve(process.cwd(), 'issue-task-mapping.json');
     this.mappingStorage = new MappingStorage(mappingFile);
 
@@ -43,28 +46,27 @@ export class WebhookServer {
     this.setupMiddleware();
   }
 
+  private updateMappingStorage(options: { mappingFile?: string } = {}) {
+    const mappingFile = options.mappingFile || path.resolve(process.cwd(), 'issue-task-mapping.json');
+    this.mappingStorage = new MappingStorage(mappingFile);
+  }
+
   /**
    * Set up webhook event handlers
    */
   private setupWebhookHandlers(): void {
     // Handle issue events (created, edited, etc.)
     this.webhooks.on('issues', async ({ payload }) => {
-
-      switch (payload.action) {
-        case 'opened':
-          await this.handleIssueCreated(payload.issue);
-          break;
-        case 'edited':
-        case 'closed':
-        case 'reopened':
-        case 'labeled':
-        case 'unlabeled':
-        case 'assigned':
-        case 'unassigned':
-          await this.handleIssueUpdated(payload.issue);
-          break;
-        default:
-          console.log(`Ignoring unsupported issue action: ${payload.action}`);
+      console.log(payload.action);
+      if (payload.action === 'opened' && !this.importing) {
+        this.importing = true;
+        await this.handleIssueCreated(payload.issue);
+        this.importing = false;
+        this.updateMappingStorage(this.options);
+      } else if (['closed', 'edited', 'reopened', 'labeled', 'unassigned', 'assigned', 'unlabeled'].includes(payload.action) && !this.importing) {
+        await this.handleIssueUpdated(payload.issue);
+      } else {
+        console.log(`Ignoring unsupported issue action: ${payload.action}`);
       }
     });
 
@@ -96,7 +98,6 @@ export class WebhookServer {
               payload: JSON.stringify(req.body),
               signature: signature,
             });
-            console.log('Webhook verified!');
             res.status(200).send('Webhook verified');
           } catch (error) {
             console.error('Webhook verification failed:', error);
@@ -128,7 +129,7 @@ export class WebhookServer {
       // Check if issue is already imported
       const existingMapping = this.mappingStorage.getMappingByGithubIssueId(issue.id);
       if (existingMapping) {
-        console.log(`Issue #${issue.number} already imported as ${existingMapping.youtrackTaskIdReadable}`);
+        console.log(`Issue #${issue.number} already imported as ${existingMapping.youtrackTaskId}`);
         return;
       }
 

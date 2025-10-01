@@ -26,7 +26,7 @@ export async function importIssues(options: { mappingFile?: string } = {}): Prom
     // Check if issue is already imported
     const existingMapping = mappingStorage.getMappingByGithubIssueId(issue.id);
     if (existingMapping) {
-      console.log(`Skipping issue #${issue.number} (already imported as ${existingMapping.youtrackTaskIdReadable})`);
+      console.log(`Skipping issue #${issue.number} (already imported as ${existingMapping.youtrackTaskId})`);
       skippedCount++;
       continue;
     }
